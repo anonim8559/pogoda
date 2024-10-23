@@ -1,59 +1,73 @@
-"use client";
-
-import { useEffect, useState } from "react";
+'use client';
+import { useState, useEffect } from "react";
 import {
-  Card,
-  CardContent,
-} from "/src/components/ui/card";
+  Sun,
+  CloudSun,
+  CloudRain,
+  Cloud,
+  Thermometer,
+  Wind,
+  AirVent
+} from 'lucide-react';
 
-export default function Pogoda() {
-  const [pogoda, setpogoda] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-    
+export default function Home() {
+  const [weatherData, setWeatherData] = useState([]);
+
   useEffect(() => {
-    const getData = async () => {
-
-      const lat = "52.178890"
-      const lon = "21.573210"
-      const key = "7affd7d3a676a87d7ba537645129bb6a"
-
+    const fetchWeatherData = async () => {
+      const lat = "52.17935";
+      const lon = "21.57251";
+      const apiKey = "d8d7ff55869412fa31237eee1bdf67ca";
+      
       try {
-        const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${key}&units=metric`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch data");
-        }
-        const json = await response.json();
-        setpogoda(json);
+        const response = await fetch(
+          `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}`
+        );
+        const data = await response.json();
+        console.log(data);
+        setWeatherData([data]);
       } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
+        console.error("Error fetching weather data:", error);
       }
     };
-    getData();
+
+    fetchWeatherData();
   }, []);
 
-  if (loading) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>;
-  }
-
-  if (error) {
-    return <div className="flex justify-center items-center h-screen">Error: {error}</div>;
-  }
-
   return (
-    <div className="flex flex-row flex-wrap items-center justify-center h-screen">
-          <Card  className="p-0 w-[300px] h-[400px] flex items-center justify-center">
-            <CardContent className="p-0">
-              <div className="flex items-center justify-center">
-                <div className="text-center flex flex-col items-center justify-center">
-                  <h1 className="text-2xl font-semibold">Minśk Mazowiecki</h1>  
-                  <h2 className="text-xl text-gray-600">{pogoda.main.temp}℃</h2> 
-                </div> 
-              </div>
-            </CardContent>
-          </Card>
+    <div className="w-full h-screen bg-gray-800 text-white flex items-center justify-center">
+      {weatherData.length > 0 && weatherData.map((item, index) => (
+        <div className="flex flex-row flex-wrap gap-4 justify-center" key={index}>
+          {item.list.map((forecast, idx) => {
+            if (idx % 8 === 0) {
+              return (
+                <div
+                  className={`${
+                    idx === 0 
+                      ? 'flex flex-col items-center w-full h-[300px] bg-gray-700' 
+                      : 'flex flex-col items-center border-2 border-slate-700 w-[400px] h-[300px] bg-gray-600 p-4 gap-2'
+                  }`}
+                  key={idx}
+                >
+                  <h1 className="text-2xl font-bold">
+                    {(forecast.main.temp - 273.15).toFixed(1)}°C
+                  </h1>
+                  <h2 className="text-lg">{forecast.dt_txt}</h2>
+                  {forecast.weather[0].main === "Clouds" && <Cloud color="white" size={50} />}
+                  {forecast.weather[0].main === "Clear" && <Sun color="white" size={50} />}
+                  {forecast.weather[0].main === "Rain" && <CloudRain color="white" size={50} />}
+                  <p className="flex items-center gap-2">
+                    <Wind /> {forecast.main.pressure} hPa | {forecast.wind.speed} m/s
+                    <Thermometer /> {(forecast.main.feels_like - 273.15).toFixed(1)}°C
+                    <AirVent /> {forecast.main.humidity}%
+                  </p>
+                </div>
+              );
+            }
+            return null; 
+          })}
+        </div>
+      ))}
     </div>
   );
 }
