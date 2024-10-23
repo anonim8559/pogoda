@@ -44,18 +44,18 @@ export default function Home() {
                 <div
                   className={`${
                     idx === 0 
-                      ? 'flex flex-col items-center w-full h-[300px] bg-gray-700' 
+                      ? 'flex flex-col items-center w-full h-[200px] bg-gray-700' 
                       : 'flex flex-col items-center border-2 border-slate-700 w-[400px] h-[300px] bg-gray-600 p-4 gap-2'
                   }`}
                   key={idx}
                 >
-                  <h1 className="text-2xl font-bold">
+                  <h1 className="text-4xl font-bold">
                     {(forecast.main.temp - 273.15).toFixed(1)}°C
                   </h1>
                   <h2 className="text-lg">{forecast.dt_txt}</h2>
-                  {forecast.weather[0].main === "Clouds" && <Cloud color="white" size={50} />}
-                  {forecast.weather[0].main === "Clear" && <Sun color="white" size={50} />}
-                  {forecast.weather[0].main === "Rain" && <CloudRain color="white" size={50} />}
+                  {forecast.weather[0].main === "Clouds" && <Cloud color="white" size={100} />}
+                  {forecast.weather[0].main === "Clear" && <Sun color="white" size={100} />}
+                  {forecast.weather[0].main === "Rain" && <CloudRain color="white" size={100} />}
                   <p className="flex items-center gap-2">
                     <Wind /> {forecast.main.pressure} hPa | {forecast.wind.speed} m/s
                     <Thermometer /> {(forecast.main.feels_like - 273.15).toFixed(1)}°C
